@@ -1,6 +1,7 @@
 import express from 'express';
-import { logger, loggerErrorMiddleware, loggerRequestResponseMiddleware } from './logService.js';
-import { users } from './userService.js';
+import { logger, loggerErrorMiddleware, loggerRequestResponseMiddleware } from './services/logService.js';
+import userRouter from "./routers/userRouter.js";
+import logRouter from "./routers/logRouter.js";
 
 const app = express();
 app.use(express.json());
@@ -8,27 +9,8 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(loggerRequestResponseMiddleware);
 
-app.get('/user', (req, res) => {
-  res.json(users);
-});
-
-app.get('/user/:id', (req, res) => {
-  if (req.params.id) {
-    const [first] = users;
-    res.json(first);
-    logger.info(`get user by id: ${req.params.id}`);
-  }
-});
-
-app.post('/user', (req, res) => {
-  users.push(req.body);
-  logger.info('user created', req.body);
-  res.json(users);
-});
-
-app.delete('/user', (req, res) => {
-  throw 'user delete not allowed';
-});
+app.use('/user',userRouter);
+app.use('/log',logRouter)
 
 app.use(loggerErrorMiddleware);
 

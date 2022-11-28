@@ -18,3 +18,4 @@ console.log(LOG_ELASTICSEARCH_ENDPOINT)
 export const logger = winston.createLogger(loggerOptions);
 export const loggerRequestResponseMiddleware = expressWinston.logger(loggerOptions);
 export const loggerErrorMiddleware = expressWinston.errorLogger(loggerOptions);
+

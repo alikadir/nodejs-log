@@ -63,3 +63,16 @@ curl http://localhost:1453/user -X POST -d '
 curl http://localhost:1453/user/292 -X DELETE 
 ```
 
+#### Write info log
+```shell
+curl "http://localhost:1453/log/info/?message=sample%20log" -X POST -d '
+{
+  "id": 1453,
+  "name": "Ali Kadir",
+  "userName": "alikadir",
+  "age": 35,
+  "email": "alikadirbagcioglu@gmail.com",
+  "birthDate": "1987-01-04T02:45:18.823Z"
+}
+' -H "Content-Type: application/json" 
+```
