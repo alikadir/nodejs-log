@@ -1,31 +1,17 @@
 import express from "express";
-import {logger} from "../services/logService.js";
+import {writeLog} from "../services/logService.js";
 
 const router = express.Router();
 
 
-const writeLog = (level, message, meta) => {
-    switch (level) {
-        case "info":
-            logger.info(message, meta);
-            break;
-        case"error":
-            logger.error(message, meta);
-            break;
-        case "warn":
-            logger.warn(message, meta);
-            break;
-        default:
-            logger.info(message, meta);
-            break;
-    }
-}
-
 router.post('/info', (req, res) => {
     const message = req.query.message;
     const meta = req.body;
-    writeLog("info", message, meta)
-    res.send("OK");
+
+    setTimeout(() => {
+        writeLog("info", message, meta)
+        res.send("OK");
+    }, 10000)
 })
 
 router.post('/error', (req, res) => {
@@ -35,11 +21,13 @@ router.post('/error', (req, res) => {
     res.send("OK");
 })
 
-router.post('/warn', (req, res) => {
+router.post('/warn', async (req, res) => {
     const message = req.query.message;
     const meta = req.body;
-    writeLog("warn", message, meta);
-    res.send("OK");
+    setTimeout(() => {
+        writeLog("warn", message, meta);
+        res.send("OK");
+    },3000);
 })
 
 export default router;
