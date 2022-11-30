@@ -12,7 +12,7 @@ router.get('/:id', (req, res) => {
     if (req.params.id) {
         const [first] = users;
         res.json(first);
-        logger.info(`get user by id: ${req.params.id}`);
+        logger.info(`Send user by id: ${req.params.id}`, first);
     }
 });
 

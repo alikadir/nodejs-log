@@ -7,11 +7,10 @@ const router = express.Router();
 router.post('/info', (req, res) => {
     const message = req.query.message;
     const meta = req.body;
+    debugger
+    writeLog("info", message, meta)
+    res.send("OK");
 
-    setTimeout(() => {
-        writeLog("info", message, meta)
-        res.send("OK");
-    }, 10000)
 })
 
 router.post('/error', (req, res) => {
@@ -24,10 +23,8 @@ router.post('/error', (req, res) => {
 router.post('/warn', async (req, res) => {
     const message = req.query.message;
     const meta = req.body;
-    setTimeout(() => {
-        writeLog("warn", message, meta);
-        res.send("OK");
-    },3000);
+    writeLog("warn", message, meta);
+    res.send("OK");
 })
 
 export default router;

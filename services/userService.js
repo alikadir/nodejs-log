@@ -1,14 +1,17 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 export let users = [];
 
 for (let i = 0; i < 50; i++) {
   users.push({
-    id: faker.random.number(999),
-    name: faker.name.findName(),
+    id: faker.datatype.uuid(),
+    name: faker.name.fullName(),
     userName: faker.internet.userName(),
-    age: faker.random.number(99),
+    age: faker.random.numeric(2),
+    avatar: faker.image.avatar(),
     email: faker.internet.email(),
     birthDate: faker.date.past(),
   });
 }
+
+

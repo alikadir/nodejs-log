@@ -5,7 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node -r dotenv/config index.js"
+    "start": "node -r dotenv/config index.js",
+    "debug": "node --inspect-brk -r dotenv/config index.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,11 +16,11 @@
     "printWidth": 110
   },
   "dependencies": {
+    "@faker-js/faker": "^7.6.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-http-context": "^1.2.4",
     "express-winston": "^4.1.0",
-    "faker": "^5.4.0",
     "winston": "^3.8.2",
     "winston-elasticsearch": "^0.17.1"
   }

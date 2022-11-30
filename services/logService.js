@@ -5,47 +5,61 @@ import HttpContext from 'express-http-context'
 
 const LOG_ELASTICSEARCH_ENDPOINT = process.env.LOG_ELASTICSEARCH_ENDPOINT;
 const LOG_FILE_PATH = process.env.LOG_FILE_PATH;
-const TRACK_ID_NAME = 'my_track_id'
+const TRANSACTION_HEADER_AND_CONTEXT_NAME = 'transaction'
 
 const loggerOptions = {
     transports: [
-        //new winston.transports.Console(),
+        new winston.transports.Console(),
         new winston.transports.File({filename: LOG_FILE_PATH}),
         new ElasticsearchTransport({clientOpts: {node: LOG_ELASTICSEARCH_ENDPOINT}, retryLimit: -1}), //https://github.com/vanthome/winston-elasticsearch/issues/219
     ],
     responseWhitelist: ['body', 'statusCode'],
     requestWhitelist: ['body', 'headers'],
 };
-console.log(LOG_ELASTICSEARCH_ENDPOINT)
-export const logger = winston.createLogger(loggerOptions);
+
+const loggerWinston = winston.createLogger(loggerOptions);
 export const loggerRequestResponseMiddleware = expressWinston.logger(loggerOptions);
 export const loggerErrorMiddleware = expressWinston.errorLogger(loggerOptions);
 
+export const logger = {
+    info: (message, meta) => writeLog('info', message, meta),
+    warn: (message, meta) => writeLog('warn', message, meta),
+    error: (message, meta) => {
+        if (meta instanceof Error)
+            writeLog('error', message, {error: {name: meta.name, message: meta.message, stack: meta.stack}});
+        else
+            writeLog('error', message, meta);
+    }
+}
 
 export const loggerTrackDetectedMiddleware = (req, res, next) => {
-    const myTrackId = req.get(TRACK_ID_NAME);
-    if (myTrackId)
-        HttpContext.set(TRACK_ID_NAME, myTrackId)
+    const transactionBase64 = req.get(TRANSACTION_HEADER_AND_CONTEXT_NAME);
+    if (transactionBase64) {
+        const transactionString = Buffer.from(transactionBase64, 'base64').toString('utf8');
+        const transaction = JSON.parse(transactionString)
+        HttpContext.set(TRANSACTION_HEADER_AND_CONTEXT_NAME, transaction)
+    }
 
     next();
 }
 
 export const writeLog = (level, message, meta) => {
-    const myTrackId = HttpContext.get(TRACK_ID_NAME);
-    const metaData = myTrackId ? {myTrackId, ...meta} : meta;
+    debugger
+    const transaction = HttpContext.get(TRANSACTION_HEADER_AND_CONTEXT_NAME);
+    const metaData = transaction ? {transaction, ...meta} : {...meta};
 
     switch (level) {
         case "info":
-            logger.info(message, metaData);
+            loggerWinston.info(message, metaData);
             break;
         case"error":
-            logger.error(message, metaData);
+            loggerWinston.error(message, metaData);
             break;
         case "warn":
-            logger.warn(message, metaData);
+            loggerWinston.warn(message, metaData);
             break;
         default:
-            logger.info(message, metaData);
+            loggerWinston.info(message, metaData);
             break;
     }
 }
