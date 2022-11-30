@@ -60,7 +60,7 @@ curl http://localhost:3000/user -X POST -d '
 
 #### Delete user by id
 ```shell
-curl http://localhost:3000/user/292 -X DELETE 
+curl http://localhost:3000/user -X DELETE 
 ```
 
 #### Write info log
@@ -77,9 +77,20 @@ curl "http://localhost:3000/log/info/?message=sample%20log" -X POST -d '
 ' -H "Content-Type: application/json" 
 ```
 
-#### Write warn log with track_id
+#### Write warn log with transaction
+
+transaction header JSON
+```json
+{"name":"Order","transactionId":"551cfda4-ce9e-4e02-971c-41cd076244f5"}
+```
+
+transaction header base64
+```
+eyJuYW1lIjoiT3JkZXIiLCJ0cmFuc2FjdGlvbklkIjoiNTUxY2ZkYTQtY2U5ZS00ZTAyLTk3MWMtNDFjZDA3NjI0NGY1In0=
+```
+
 ```shell
-curl "http://localhost:3000/log/warn/?message=sample%20log%20with%20trackid" -X POST -d '
+curl "http://localhost:3000/log/warn/?message=sample%20log%20with%20transaction" -X POST -d '
 {
   "id": 1453,
   "name": "Ali Kadir",
@@ -88,7 +99,7 @@ curl "http://localhost:3000/log/warn/?message=sample%20log%20with%20trackid" -X 
   "email": "alikadirbagcioglu@gmail.com",
   "birthDate": "1987-01-04T02:45:18.823Z"
 }
-' -H "Content-Type: application/json" -H "my_track_id: 8123fc8f-0cdf-443e-bfd9-86b6c07a6e1c" 
+' -H "Content-Type: application/json" -H "transaction: eyJuYW1lIjoiT3JkZXIiLCJ0cmFuc2FjdGlvbklkIjoiNTUxY2ZkYTQtY2U5ZS00ZTAyLTk3MWMtNDFjZDA3NjI0NGY1In0=" 
 ```
 
 ## Log View
