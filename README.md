@@ -60,7 +60,7 @@ curl http://localhost:3000/user -X POST -d '
 
 #### Delete user by id
 ```shell
-curl http://localhost:3000/user -X DELETE 
+curl http://localhost:3000/user/123 -X DELETE 
 ```
 
 #### Write info log
@@ -105,18 +105,30 @@ curl "http://localhost:3000/log/warn/?message=sample%20log%20with%20transaction"
 ## Log View
 
 #### Step 1 - Open kibana
-```shell
+```
 http://localhost:5601
 ```
 #### Step 2 - Configure indexes
-```shell
+```
 Hamburger Menu > Management > Stack Management > Kibana >Index Patterns > Create Index Pattern (logs-*)
 ```
 
 #### Step 3 - View and Search Logs
-```shell
+```
 Hamburger Menu > Analytics > Discover > Select Index Pattern
 ```
+
+#### Step (optional) - Remove Index with Kibana UI
+```
+Hamburger Menu > Management > Stack Management > Data > Index Management > (Select Index) >  "Manage Index" select box > Delete
+```
+
+#### Step (optional) - Remove Index with curl
+```shell
+curl "localhost:9200/logs-2022.12.01" -X DELETE
+```
+
+
 
 ## Troubleshooting
 
@@ -139,5 +151,7 @@ curl "localhost:9200/logs-2022.11.29/_settings" -X PUT -d '
 this is a winston's elasticsearch transport problem
 
 https://github.com/vanthome/winston-elasticsearch/issues/219
+
+
 
 
