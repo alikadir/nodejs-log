@@ -1,24 +1,27 @@
-
-# NodeJS Elastic and Kibana Log 
+# NodeJS Elastic and Kibana Log
 
 ## Installation
 
 #### Step 1 - edit environment variables
+
 ```shell
 cp .env.example .env
 ```
-NOTE: dotenv import problem because of Hoisting, -r = require 
+
+NOTE: dotenv import problem because of Hoisting, -r = require
+
 ```shell
 node -r dotenv/config index.js
 ```
 
-
 #### Step 2 - install dependencies
+
 ```shell
 npm install
 ```
 
-#### Step 3 - run elasticsearch and kibana 
+#### Step 3 - run elasticsearch and kibana
+
 ```shell
 docker-compose up
 ```
@@ -26,6 +29,7 @@ docker-compose up
 ## Run
 
 #### Step 4 - run the app
+
 ```shell
 npm start
 ```
@@ -35,16 +39,19 @@ npm start
 NOTE: jq is a lightweight and flexible command-line JSON processor.
 
 #### Get all users
+
 ```shell
  curl http://localhost:3000/user | jq .
 ```
 
-#### Get user by id 
+#### Get user by id
+
 ```shell
  curl http://localhost:3000/user/292 | jq .
 ```
 
 #### Post user (create)
+
 ```shell
 curl http://localhost:3000/user -X POST -d '
 {
@@ -59,11 +66,13 @@ curl http://localhost:3000/user -X POST -d '
 ```
 
 #### Delete user by id
+
 ```shell
 curl http://localhost:3000/user/123 -X DELETE 
 ```
 
 #### Write info log
+
 ```shell
 curl "http://localhost:3000/log/info/?message=sample%20log" -X POST -d '
 {
@@ -80,11 +89,16 @@ curl "http://localhost:3000/log/info/?message=sample%20log" -X POST -d '
 #### Write warn log with transaction
 
 transaction header JSON
+
 ```json
-{"name":"Order","transactionId":"551cfda4-ce9e-4e02-971c-41cd076244f5"}
+{
+  "name": "Order",
+  "transactionId": "551cfda4-ce9e-4e02-971c-41cd076244f5"
+}
 ```
 
 transaction header base64
+
 ```
 eyJuYW1lIjoiT3JkZXIiLCJ0cmFuc2FjdGlvbklkIjoiNTUxY2ZkYTQtY2U5ZS00ZTAyLTk3MWMtNDFjZDA3NjI0NGY1In0=
 ```
@@ -105,30 +119,34 @@ curl "http://localhost:3000/log/warn/?message=sample%20log%20with%20transaction"
 ## Log View
 
 #### Step 1 - Open kibana
+
 ```
 http://localhost:5601
 ```
+
 #### Step 2 - Configure indexes
+
 ```
 Hamburger Menu > Management > Stack Management > Kibana >Index Patterns > Create Index Pattern (logs-*)
 ```
 
 #### Step 3 - View and Search Logs
+
 ```
 Hamburger Menu > Analytics > Discover > Select Index Pattern
 ```
 
 #### Step (optional) - Remove Index with Kibana UI
+
 ```
 Hamburger Menu > Management > Stack Management > Data > Index Management > (Select Index) >  "Manage Index" select box > Delete
 ```
 
 #### Step (optional) - Remove Index with curl
+
 ```shell
 curl "localhost:9200/logs-2022.12.01" -X DELETE
 ```
-
-
 
 ## Troubleshooting
 

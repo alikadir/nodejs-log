@@ -1,11 +1,13 @@
 import winston from 'winston';
-//import {ElasticsearchTransport} from 'winston-elasticsearch';
 import expressWinston from 'express-winston';
 import HttpContext from 'express-http-context'
-//import LogstashTransport from 'winston3-logstash-transport';
 import LogstashTransport from 'winston-logstash/lib/winston-logstash-latest.js';
+import {UAParser} from 'ua-parser-js'
 
-const LOG_ELASTICSEARCH_ENDPOINT = process.env.LOG_ELASTICSEARCH_ENDPOINT;
+
+const LOG_LOGSTASH_HOST = process.env.LOG_LOGSTASH_HOST;
+const LOG_LOGSTASH_PORT = process.env.LOG_LOGSTASH_PORT;
+
 const LOG_FILE_PATH = process.env.LOG_FILE_PATH;
 const TRANSACTION_HEADER_AND_CONTEXT_NAME = 'transaction'
 const DEVICE_INFO_NAME = 'deviceInfo'
@@ -15,19 +17,9 @@ const loggerOptions = {
         new winston.transports.Console(),
         new winston.transports.File({filename: LOG_FILE_PATH}),
         new LogstashTransport({
-            port: 28777,
-            node_name: 'my node name',
-            host: '127.0.0.1'
+            port: LOG_LOGSTASH_PORT,
+            host: LOG_LOGSTASH_HOST
         })
-        /*
-         new LogstashTransport({
-             mode: 'udp',
-             host: LOG_ELASTICSEARCH_ENDPOINT,
-             port: 28777
-         }),
-         */
-
-        //new ElasticsearchTransport({clientOpts: {node: LOG_ELASTICSEARCH_ENDPOINT}, retryLimit: -1}), //https://github.com/vanthome/winston-elasticsearch/issues/219
     ],
     responseWhitelist: ['body', 'statusCode'],
     requestWhitelist: ['body', 'headers'],
@@ -60,30 +52,49 @@ export const loggerTrackDetectorMiddleware = (req, res, next) => {
 }
 
 export const loggerDeviceInfoDetectorMiddleware = (req, res, next) => {
-    const userAgent = req.userAgent;
-    const deviceInfo = {} //TODO: parse userAgent
+
+    const userAgent = req.get('user-agent');
+    let parser = new UAParser(userAgent);
+
+    const deviceInfo = {
+        device: parser.getDevice(),
+        os: parser.getOS(),
+        browser: parser.getBrowser(),
+        engine: parser.getEngine()
+    }
+
     HttpContext.set(DEVICE_INFO_NAME, deviceInfo)
 
     next();
 }
 
 export const writeLog = (level, message, meta) => {
-    debugger
+
     const transaction = HttpContext.get(TRANSACTION_HEADER_AND_CONTEXT_NAME);
-    const metaData = transaction ? {transaction, ...meta} : {...meta};
+    const deviceInfo = HttpContext.get(DEVICE_INFO_NAME);
+
+    let metaData;
+    if (transaction && deviceInfo)
+        metaData = {transaction, deviceInfo, ...meta}
+    else if (transaction)
+        metaData = {transaction, ...meta}
+    else if (deviceInfo)
+        metaData = {deviceInfo, ...meta}
+    else
+        metaData = {...meta}
 
     switch (level) {
         case "info":
-            loggerWinston.info(message, metaData);
+            loggerWinston.info(message, {meta: metaData});
             break;
         case"error":
-            loggerWinston.error(message, metaData);
+            loggerWinston.error(message, {meta: metaData});
             break;
         case "warn":
-            loggerWinston.warn(message, metaData);
+            loggerWinston.warn(message, {meta: metaData});
             break;
         default:
-            loggerWinston.info(message, metaData);
+            loggerWinston.info(message, {meta: metaData});
             break;
     }
 }

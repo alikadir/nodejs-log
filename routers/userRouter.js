@@ -23,10 +23,14 @@ router.post('/', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-    const userId = req.params.id;
-    logger.info('DENEME - Cannot delete user that is admin! from Server', {userId});
-    logger.error('Cannot delete user that is admin! from Server', {userId});
-    res.status(401).send("user delete not allowed"); // unauthorized
+    try {
+        const userId = req.params.id;
+        throw new Error(`Cannot delete user that is admin! (userId: ${userId}) from Server`);
+        res.send("OK");
+    } catch (error) {
+        logger.error('Delete user exception from Backend Server', error);
+        res.status(401).send("user delete not allowed"); // unauthorized
+    }
 });
 
 export default router;

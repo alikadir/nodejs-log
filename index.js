@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from "cors";
 import {
-  logger,
+  logger, loggerDeviceInfoDetectorMiddleware,
   loggerErrorMiddleware,
   loggerRequestResponseMiddleware,
   loggerTrackDetectorMiddleware
@@ -18,6 +18,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(loggerRequestResponseMiddleware);
 app.use(HttpContext.middleware);
 app.use(loggerTrackDetectorMiddleware)
+app.use(loggerDeviceInfoDetectorMiddleware)
 
 app.use('/user',userRouter);
 app.use('/log',logRouter)
